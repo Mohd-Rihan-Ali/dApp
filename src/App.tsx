@@ -1,26 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.scss";
+import { WalletConnect } from "./components/WalletConnect";
+import NetworkSwitch from "./components/NetworkSwitch";
+import { EthTransferEther } from "./components/EthTransfer";
 
-function App() {
+export const App = () => {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>DAPP</h1>
+
+      <h2>Connect to wallet</h2>
+      <WalletConnect />
+
+      <h2>Network Switching</h2>
+      <NetworkSwitch />
+
+      <h2>Transfer amount in Eth</h2>
+      <EthTransferEther />
     </div>
   );
-}
-
-export default App;
+};
