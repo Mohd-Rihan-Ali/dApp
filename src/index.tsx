@@ -5,17 +5,22 @@ import { App } from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { EthersProvider } from "./utils/context/EthersContext";
 import { Web3Provider } from "./utils/context/Web3Context";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({});
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <EthersProvider>
-      <Web3Provider>
-        <App />
-      </Web3Provider>
-    </EthersProvider>
+    <QueryClientProvider client={queryClient}>
+      <EthersProvider>
+        <Web3Provider>
+          <App />
+        </Web3Provider>
+      </EthersProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
 

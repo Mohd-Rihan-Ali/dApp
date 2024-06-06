@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import { createContext, useState, useEffect, useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 // interface State {
 //   account: string | null;
@@ -12,6 +13,8 @@ const initialContext = {
   ethersAccount: null,
   ethersRecipient: "",
   ethersAmount: "",
+  ethersBalance: "",
+  bnbBalance: "",
   ethersCurrentNetwork: "",
   isLoading: false,
   isSwitching: false,
@@ -48,9 +51,40 @@ export const EthersProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSwitching, setIsSwitching] = useState<boolean>(false);
   const [isTransfering, setIsTransfering] = useState<boolean>(false);
+  let ethersBalance = 0;
+  let bnbBalance = 0;
+
+  const ethersBalanceQuery = useQuery({
+    queryKey: [],
+    queryFn: async () => {
+      if (ethersAccount) {
+        return await fetch(
+          `http://localhost:8800/api/eth-balance/${ethersAccount}`
+        ).then((res) => res.json());
+      }
+    },
+    enabled: !!ethersAccount,
+  });
+
+  ethersBalance = ethersBalanceQuery.data;
+
+  const bnbBalanceQuery = useQuery({
+    queryKey: [],
+    queryFn: async () => {
+      if (ethersAccount) {
+        return await fetch(
+          `http://localhost:8800/api/bnb-balance/${ethersAccount}`
+        ).then((res) => res.json());
+      }
+    },
+    enabled: !!ethersAccount,
+  });
+
+  bnbBalance = bnbBalanceQuery.data;
 
   const EthersWalletConnect = async () => {
     setIsLoading(true);
+
     if ((window as any).ethereum) {
       const provider = new ethers.providers.Web3Provider(
         (window as any).ethereum
@@ -102,12 +136,12 @@ export const EthersProvider: React.FC<{ children: React.ReactNode }> = ({
         const amountInWei = ethers.utils.parseEther(ethersAmount);
 
         // Check for sufficient balance
-        // if (balance.lt(amountInWei)) {
-        //   alert("Insufficient balance");
-        //   console.error("Insufficient balance");
-        //   setIsTransfering(false);
-        //   return;
-        // }
+        if (balance.lt(amountInWei)) {
+          alert("Insufficient balance");
+          console.error("Insufficient balance");
+          setIsTransfering(false);
+          return;
+        }
 
         const tx = await signer.sendTransaction({
           to: ethersRecipient,
@@ -136,6 +170,8 @@ export const EthersProvider: React.FC<{ children: React.ReactNode }> = ({
           ethersRecipient,
           ethersAmount,
           ethersCurrentNetwork,
+          ethersBalance,
+          bnbBalance,
           isLoading,
           isSwitching,
           isTransfering,
